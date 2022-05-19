@@ -23,6 +23,14 @@ ______
 
 ## Для запуска проекта необходимо:
 - Из корня проекта выполните команду `cp .env.sample .env`
+- Добавьте в .env настройки базы данных
+```
+DB_NAME=movies_database
+DB_USER=app
+DB_PASSWORD=123qwe
+DB_HOST=db
+DB_PORT=5432
+```
 - Собираем проект `docker-compose build`
 - Для запуска используйте команду `docker-compose up`
 
