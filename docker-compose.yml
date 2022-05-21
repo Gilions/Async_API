@@ -87,6 +87,21 @@ services:
     depends_on:
       - web
 
+  #================================
+  #       ETL
+  #================================
+  etl_service:
+    build:
+      dockerfile: Dockerfile_etl
+    image: etl_service
+    container_name: movies_etl
+    restart: on-failure
+    env_file:
+      - .env
+    depends_on:
+      - elastic
+    command: python3 ./main.py
+
 #================================
 #         NETWORK
 #================================
