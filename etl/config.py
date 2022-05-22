@@ -156,7 +156,28 @@ INDEX_GENRES = {
     "settings": INDEX_SETTINGS
 }
 
+INDEX_PERSONS = {
+    "index": "persons",
+    "mappings": {
+        "dynamic": "strict",
+        "properties": {
+            "id": {
+                "type": "keyword"
+            },
+            "full_name": {
+                "type": "text",
+                "analyzer": "ru_en"
+            },
+            "birth_date": {
+                "type": "date"
+            }
+        }
+    },
+    "settings": INDEX_SETTINGS
+}
+
 INDICES = {
     'movies': INDEX_MOVIES,
-    'genres': INDEX_GENRES
+    'genres': INDEX_GENRES,
+    'persons': INDEX_PERSONS
 }

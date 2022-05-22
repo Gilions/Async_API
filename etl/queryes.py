@@ -50,6 +50,14 @@ INNER JOIN genre_film_work gfw ON g.id = gfw.genre_id
 WHERE {param};
 """
 
+# Выгружаем данные по людям
+PERSON_SQL = """
+SELECT DISTINCT pp.id, pp.full_name, pp.birth_date
+FROM person pp
+INNER JOIN person_film_work pfw ON pp.id = pfw.person_id
+WHERE {param};
+"""
+
 # Записываем данные последнего запуска процесса
 INSERT_ETL = """
 INSERT INTO external.etl_services (process, start)
