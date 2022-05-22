@@ -44,8 +44,9 @@ ORDER BY fw.modified;
 
 # Выгружаем данные по жанрам
 GENRE_SQL = """
-SELECT id, name, description
-FROM content.genre
+SELECT DISTINCT g.id, g.name, g.description
+FROM genre g
+INNER JOIN genre_film_work gfw ON g.id = gfw.genre_id
 WHERE {param};
 """
 
