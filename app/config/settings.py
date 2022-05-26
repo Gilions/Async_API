@@ -26,10 +26,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'movies.apps.MoviesConfig',
-    "debug_toolbar",
+    'debug_toolbar',
     'django_extensions',
     'corsheaders',
+    'movies.apps.MoviesConfig',
+    'external_services.apps.ExternalServicesConfig'
 ]
 
 MIDDLEWARE = [
