@@ -4,9 +4,9 @@ from typing import Any
 
 from config import DSL, DSL_ELK, INDICES
 from elk_client import ELKClient
-from models import Genres, Movies
+from models import Genres, Movies, Persons
 from pg_client import PGClient
-from queryes import FW_SQL, GENRE_SQL, INSERT_ETL, SELECT_ETL
+from queryes import FW_SQL, GENRE_SQL, INSERT_ETL, SELECT_ETL, PERSON_SQL
 
 
 class BaseStorage:
@@ -108,9 +108,19 @@ class UpdateElasticStorage:
         self.elk_client.bulk_update(data, 'genres')
         self.process.set_state()
 
+    def persons(self):
+        param = """modified > '{date_time}'"""
+        stage = self.process.get_state('persons')
+        sql = self._generate_query(sql=PERSON_SQL, param=param, stage=stage)
+        data = self.generate_data(self.pg_client.select(sql), models=Persons)
+        self.elk_client.bulk_update(data, 'persons')
+        self.process.set_state()
+
     def run(self):
         for index in self.indices.keys():
             if index == 'movies':
                 self.movies()
             elif index == 'genres':
                 self.genres()
+            elif index == 'persons':
+                self.persons()

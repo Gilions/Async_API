@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
@@ -34,3 +35,9 @@ class Genres(BaseModel):
     id: str
     name: str
     description: str = None
+
+
+class Persons(BaseModel):
+    id: str
+    full_name: str
+    birth_date: datetime = None
