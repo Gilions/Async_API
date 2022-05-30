@@ -1,6 +1,6 @@
 from functools import lru_cache
 from typing import Optional, List
-from models.film import orjson_dumps
+
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
@@ -8,8 +8,10 @@ from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from models.film import Film
+from models.movies import Film
 from orjson import loads
+
+from services.utility import orjson_dumps
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
