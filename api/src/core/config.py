@@ -17,5 +17,7 @@ REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 ELASTIC_HOST = os.getenv('EL_HOST', '127.0.0.1')
 ELASTIC_PORT = int(os.getenv('EL_PORT', 9200))
 
-# Корень проекта
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+CACHE_EXPIRE_IN_SECONDS = 60 * 5
+MESSEGE_NON_FOUND = 'Data not found'

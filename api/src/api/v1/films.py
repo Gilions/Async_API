@@ -1,17 +1,19 @@
 from http import HTTPStatus
-from typing import Optional, List, Union
+from typing import List, Optional, Union
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from services.films import FilmsService, FilmService, get_film_service, get_films_service
-
+from core.config import MESSEGE_NON_FOUND
+from services.films import (FilmService, FilmsService, get_film_service,
+                            get_films_service)
 
 router = APIRouter()
 
 
 class FilmDitail(BaseModel):
-    uuid: str
+    uuid: UUID
     imdb_rating: Optional[float]
     title: str
     description: str = None
@@ -22,7 +24,7 @@ class FilmDitail(BaseModel):
 
 
 class Films(BaseModel):
-    uuid: str
+    uuid: UUID
     title: str
     imdb_rating: Optional[float]
 
@@ -32,12 +34,13 @@ async def films(
         sort: Union[str, None] = None,
         page_size: int = Query(50, alias="page[size]"),
         page_number: int = Query(1, alias="page[number]"),
-        films_service: FilmsService = Depends(get_films_service)) -> List[Films]:
-    response = [
-        Films(**dict(film))
-        for film in await films_service.get_films(sorting=sort, page_size=page_size, page_number=page_number)]
-    if not response:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
+        service: FilmsService = Depends(get_films_service)) -> List[Films]:
+    data = await service.get_data(sorting=sort, page_size=page_size, page_number=page_number)
+
+    if not data:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=MESSEGE_NON_FOUND)
+
+    response = [Films(**dict(row)) for row in data]
     return response
 
 
@@ -46,20 +49,20 @@ async def films_search(
         query: Union[str, None] = None,
         page_size: int = Query(50, alias="page[size]"),
         page_number: int = Query(1, alias="page[number]"),
-        films_service: FilmsService = Depends(get_films_service)) -> List[Films]:
-    response = [
-        Films(**dict(data))
-        for data in await films_service.get_films(search=query, page_size=page_size, page_number=page_number)]
-    if not response:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
+        service: FilmsService = Depends(get_films_service)) -> List[Films]:
+    data = await service.get_data(search=query, page_size=page_size, page_number=page_number)
+
+    if not data:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=MESSEGE_NON_FOUND)
+
+    response = [Films(**dict(row)) for row in data]
     return response
 
 
-@router.get('/{film_id}', response_model=FilmDitail)
-async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> FilmDitail:
-    film = await film_service.get_by_id(film_id)
+@router.get('/{film_uuid}', response_model=FilmDitail)
+async def film_details(film_uuid: UUID, service: FilmService = Depends(get_film_service)) -> FilmDitail:
+    film = await service.get_by_uuid(film_uuid)
     response = FilmDitail(**dict(film))
     if not response:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=MESSEGE_NON_FOUND)
     return response
-
