@@ -4,9 +4,7 @@ import orjson
 
 from pydantic import BaseModel, Field
 
-
-def orjson_dumps(v, *, default):
-    return orjson.dumps(v, default=default).decode()
+from services.utility import orjson_dumps
 
 
 class Film(BaseModel):
@@ -18,6 +16,26 @@ class Film(BaseModel):
     actors: Optional[List]
     writers: Optional[List]
     directors: Optional[List]
+
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
+
+
+class Genre(BaseModel):
+    uuid: str
+    name: str
+
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
+
+
+class Person(BaseModel):
+    uuid: str
+    full_name: str
+    role: str
+    film_ids: Optional[List]
 
     class Config:
         json_loads = orjson.loads
