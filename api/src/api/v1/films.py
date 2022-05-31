@@ -29,8 +29,8 @@ class Films(BaseModel):
     imdb_rating: Optional[float]
 
 
-@router.get('', response_model=List[Films])
-async def films(
+@router.get('/', response_model=List[Films])
+async def films_index(
         sort: Union[str, None] = None,
         page_size: int = Query(50, alias="page[size]"),
         page_number: int = Query(1, alias="page[number]"),

@@ -5,6 +5,6 @@ from aioredis import Redis
 redis: Optional[Redis] = None
 
 
-# Функция понадобится при внедрении зависимостей
+# Подключаем Redis
 async def get_redis() -> Redis:
     return redis

@@ -28,14 +28,16 @@ class PersonsService(BaseListService):
         query = {
             "size": page_size,
             "from": (page_number - 1) * page_size,
-            'query': {
+            "query": {"match_all": {}}
+        }
+        if search:
+            query['query'] = {
                 'simple_query_string': {
                     'query': search,
                     'fields': ['uuid', 'full_name^3', 'role'],
                     'default_operator': 'or'
                 }
             }
-        }
         try:
             data = await self.elastic.search(index=self.index, body=query)
             response = [self.model(**row['_source']) for row in data['hits']['hits']]

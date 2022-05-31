@@ -15,6 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDitailService:
+    """
+    Базовый клас, используется для вывода конкретного инстанса.
+    :param redis - Редис, используется для кеширования данных.
+    :param elastic - Основная БД
+    """
     model = None
     index = None
 
@@ -27,6 +32,8 @@ class BaseDitailService:
             raise ValueError('Необходимо указать модель и индекс')
 
     async def get_by_uuid(self, uuid: UUID) -> Optional[Union[Film, Genre, Person]]:
+        # Используется следующая логика:
+        # Проверяем кеш, если нет идем в БД, полученные данные кешируем на 5 минут.
         data = await self._get_from_cache(uuid)
         if not data:
             data = await self._get_from_elastic(uuid)
@@ -53,6 +60,11 @@ class BaseDitailService:
 
 
 class BaseListService:
+    """
+        Базовый клас, используется для вывода списка инстансов.
+        :param redis - Редис, используется для кеширования данных.
+        :param elastic - Основная БД
+        """
     model = None
     index = None
 
@@ -70,7 +82,9 @@ class BaseListService:
             sorting: str = None,
             page_size: int = None,
             page_number: int = None):
-        key = '{}/{}/{}/{}'.format(search, sorting, page_size, page_number)
+        # Используется следующая логика:
+        # Проверяем кеш, если нет идем в БД, полученные данные кешируем на 5 минут.
+        key = '{}/{}/{}/{}/{}'.format(self.index, search, sorting, page_size, page_number)
         data = await self._get_from_cache(key=key)
         if not data:
             data = await self._get_from_elastic(

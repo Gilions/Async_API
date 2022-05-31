@@ -17,8 +17,8 @@ class Genres(BaseModel):
     name: str
 
 
-@router.get('', response_model=List[Genres])
-async def genres(
+@router.get('/', response_model=List[Genres])
+async def genres_index(
         page_size: int = Query(50, alias="page[size]"),
         page_number: int = Query(1, alias="page[number]"),
         service: GenresService = Depends(get_genres_service)) -> List[Genres]:
