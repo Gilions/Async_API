@@ -70,14 +70,11 @@ INDEX_MOVIES = {
     "mappings": {
         "dynamic": "strict",
         "properties": {
-            "id": {
+            "uuid": {
                 "type": "keyword"
             },
             "imdb_rating": {
                 "type": "float"
-            },
-            "genre": {
-                "type": "keyword"
             },
             "title": {
                 "type": "text",
@@ -92,23 +89,24 @@ INDEX_MOVIES = {
                 "type": "text",
                 "analyzer": "ru_en"
             },
-            "director": {
-                "type": "text",
-                "analyzer": "ru_en"
-            },
-            "actors_names": {
-                "type": "text",
-                "analyzer": "ru_en"
-            },
-            "writers_names": {
-                "type": "text",
-                "analyzer": "ru_en"
-            },
             "actors": {
                 "type": "nested",
                 "dynamic": "strict",
                 "properties": {
-                    "id": {
+                    "uuid": {
+                        "type": "keyword"
+                    },
+                    "full_name": {
+                        "type": "text",
+                        "analyzer": "ru_en"
+                    }
+                }
+            },
+            "genre": {
+                "type": "nested",
+                "dynamic": "strict",
+                "properties": {
+                    "uuid": {
                         "type": "keyword"
                     },
                     "name": {
@@ -121,10 +119,23 @@ INDEX_MOVIES = {
                 "type": "nested",
                 "dynamic": "strict",
                 "properties": {
-                    "id": {
+                    "uuid": {
                         "type": "keyword"
                     },
-                    "name": {
+                    "full_name": {
+                        "type": "text",
+                        "analyzer": "ru_en"
+                    }
+                }
+            },
+            "directors": {
+                "type": "nested",
+                "dynamic": "strict",
+                "properties": {
+                    "uuid": {
+                        "type": "keyword"
+                    },
+                    "full_name": {
                         "type": "text",
                         "analyzer": "ru_en"
                     }
@@ -140,14 +151,10 @@ INDEX_GENRES = {
     "mappings": {
         "dynamic": "strict",
         "properties": {
-            "id": {
+            "uuid": {
                 "type": "keyword"
             },
             "name": {
-                "type": "text",
-                "analyzer": "ru_en"
-            },
-            "description": {
                 "type": "text",
                 "analyzer": "ru_en"
             }
@@ -161,15 +168,19 @@ INDEX_PERSONS = {
     "mappings": {
         "dynamic": "strict",
         "properties": {
-            "id": {
+            "uuid": {
                 "type": "keyword"
             },
             "full_name": {
                 "type": "text",
                 "analyzer": "ru_en"
             },
-            "birth_date": {
-                "type": "date"
+            "role": {
+                "type": "text",
+                "analyzer": "ru_en"
+            },
+            "film_ids": {
+                "type": "keyword"
             }
         }
     },

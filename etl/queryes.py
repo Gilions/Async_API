@@ -1,17 +1,14 @@
 # Выгружаем данные по произведениям
 FW_SQL = """
-SELECT fw.id,
+SELECT fw.id as uuid,
        fw.title,
        fw.description,
-       fw.rating,
-       fw.type,
-       fw.created,
-       fw.modified,
+       fw.rating as imdb_rating,
        COALESCE(
            JSON_AGG(
                DISTINCT JSONB_BUILD_OBJECT(
-                   'person_id', p.id,
-                   'person_name', p.full_name
+                   'uuid', p.id,
+                   'full_name', p.full_name
                    )
                ) FILTER (WHERE p.id IS NOT NULL and pfw.role = 'actor'),
            '[]'
@@ -19,19 +16,30 @@ SELECT fw.id,
        COALESCE(
            JSON_AGG(
                DISTINCT JSONB_BUILD_OBJECT(
-                   'person_id', p.id,
-                   'person_name', p.full_name
+                   'uuid', p.id,
+                   'full_name', p.full_name
                    )
                ) FILTER (WHERE p.id IS NOT NULL and pfw.role = 'writer'),
            '[]'
            ) AS writers,
-        ARRAY_AGG(DISTINCT p.full_name)
-            FILTER(WHERE pfw.role = 'director') AS director,
-        ARRAY_AGG(DISTINCT p.full_name)
-            FILTER(WHERE pfw.role = 'writer') AS writers_names,
-        ARRAY_AGG(DISTINCT p.full_name)
-            FILTER(WHERE pfw.role = 'actor') AS actors_names,
-       ARRAY_AGG(DISTINCT g.name) AS genres
+       COALESCE(
+           JSON_AGG(
+               DISTINCT JSONB_BUILD_OBJECT(
+                   'uuid', p.id,
+                   'full_name', p.full_name
+                   )
+               ) FILTER (WHERE p.id IS NOT NULL and pfw.role = 'director'),
+           '[]'
+           ) AS directors,
+       COALESCE(
+           JSON_AGG(
+               DISTINCT JSONB_BUILD_OBJECT(
+                   'uuid', g.id,
+                   'name', g.name
+                   )
+               ) FILTER (WHERE g.id IS NOT NULL),
+           '[]'
+           ) AS genre
 FROM content.film_work fw
          LEFT JOIN content.genre_film_work gfw ON gfw.film_work_id = fw.id
          LEFT JOIN content.genre g ON g.id = gfw.genre_id
@@ -44,7 +52,9 @@ ORDER BY fw.modified;
 
 # Выгружаем данные по жанрам
 GENRE_SQL = """
-SELECT DISTINCT g.id, g.name, g.description
+SELECT DISTINCT
+    g.id as uuid,
+    g.name
 FROM genre g
 INNER JOIN genre_film_work gfw ON g.id = gfw.genre_id
 WHERE {param};
@@ -52,10 +62,15 @@ WHERE {param};
 
 # Выгружаем данные по людям
 PERSON_SQL = """
-SELECT DISTINCT pp.id, pp.full_name, pp.birth_date
+SELECT DISTINCT
+    pp.id as uuid,
+    pp.full_name,
+    pfw.role,
+    array_agg(DISTINCT pfw.id::text) as film_ids
 FROM person pp
 INNER JOIN person_film_work pfw ON pp.id = pfw.person_id
-WHERE {param};
+WHERE {param}
+GROUP BY pp.id, pp.full_name, pfw.role;
 """
 
 # Записываем данные последнего запуска процесса

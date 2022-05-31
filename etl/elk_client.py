@@ -43,7 +43,7 @@ class ELKClient:
         for row in data:
             yield {
                 '_index': index,
-                '_id': row.id,
+                '_id': row.uuid,
                 '_source': row.json()
             }
 
