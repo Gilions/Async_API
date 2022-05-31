@@ -6,18 +6,18 @@ from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from models.movies import Film
+from models.movies import Person
 from services.base import BaseDitailService, BaseListService
 
 
-class FilmService(BaseDitailService):
-    model = Film
-    index = 'movies'
+class PersonService(BaseDitailService):
+    model = Person
+    index = 'persons'
 
 
-class FilmsService(BaseListService):
-    model = Film
-    index = 'movies'
+class PersonsService(BaseListService):
+    model = Person
+    index = 'persons'
 
     async def _get_from_elastic(
             self,
@@ -30,14 +30,11 @@ class FilmsService(BaseListService):
             "from": (page_number - 1) * page_size,
             "query": {"match_all": {}}
         }
-        if sorting:
-            method = 'desc' if sorting == '-imdb_rating' else 'asc'
-            query['sort'] = [dict(imdb_rating=method)]
-        elif search:
+        if search:
             query['query'] = {
                 'simple_query_string': {
                     'query': search,
-                    'fields': ['title^3', 'description'],
+                    'fields': ['uuid', 'full_name^3', 'role'],
                     'default_operator': 'or'
                 }
             }
@@ -50,16 +47,16 @@ class FilmsService(BaseListService):
 
 
 @lru_cache()
-def get_film_service(
+def get_person_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
-) -> FilmService:
-    return FilmService(redis, elastic)
+) -> PersonService:
+    return PersonService(redis, elastic)
 
 
 @lru_cache()
-def get_films_service(
+def get_persons_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
-) -> FilmsService:
-    return FilmsService(redis, elastic)
+) -> PersonsService:
+    return PersonsService(redis, elastic)

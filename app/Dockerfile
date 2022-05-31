@@ -5,7 +5,7 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY app/requirements.txt /app
+COPY requirements.txt .
 
 RUN \
  apk add --no-cache python3 postgresql-libs && \
@@ -13,7 +13,7 @@ RUN \
  python3 -m pip install -r requirements.txt --no-cache-dir && \
  apk --purge del .build-deps && mkdir media && mkdir static
 
-COPY app .
+COPY . .
 
 RUN addgroup -S web && adduser -S web -G web \
     && chown web:web -R /app

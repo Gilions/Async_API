@@ -1,14 +1,14 @@
-from typing import Optional, List
+from typing import List, Optional
+from uuid import UUID
 
 import orjson
-
 from pydantic import BaseModel, Field
 
 from services.utility import orjson_dumps
 
 
 class Film(BaseModel):
-    uuid: str
+    uuid: UUID
     imdb_rating: Optional[float] = Field(default=0)
     title: str
     description: str = None
@@ -23,7 +23,7 @@ class Film(BaseModel):
 
 
 class Genre(BaseModel):
-    uuid: str
+    uuid: UUID
     name: str
 
     class Config:
@@ -32,7 +32,7 @@ class Genre(BaseModel):
 
 
 class Person(BaseModel):
-    uuid: str
+    uuid: UUID
     full_name: str
     role: str
     film_ids: Optional[List]

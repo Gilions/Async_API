@@ -40,7 +40,7 @@ services:
 #================================
   web:
     build:
-      dockerfile: Dockerfile_movies
+      context: ./app
     image: movies_web
     container_name: movies_web
     restart: on-failure
@@ -92,7 +92,7 @@ services:
   #================================
   etl_service:
     build:
-      dockerfile: Dockerfile_etl
+      context: ./etl
     image: etl_service
     container_name: movies_etl
     restart: on-failure
@@ -101,6 +101,16 @@ services:
     depends_on:
       - elastic
     command: python3 ./main.py
+
+#================================
+#       Redis
+#================================
+  redis:
+    image: redis:7.0
+    container_name: movies_redis
+    restart: always
+    ports:
+      - "6379:6379"
 
 #================================
 #         NETWORK
