@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic.main import BaseModel
 
 from core.config import MESSEGE_NON_FOUND
+from services.base import Paginator, get_paginator_params
 from services.genres import (GenreService, GenresService, get_genre_service,
                              get_genres_service)
 
@@ -19,10 +20,9 @@ class Genres(BaseModel):
 
 @router.get('/', response_model=List[Genres])
 async def genres_index(
-        page_size: int = Query(50, alias="page[size]"),
-        page_number: int = Query(1, alias="page[number]"),
+        paginator: Paginator = Depends(get_paginator_params),
         service: GenresService = Depends(get_genres_service)) -> List[Genres]:
-    data = await service.get_data(page_size=page_size, page_number=page_number)
+    data = await service.get_data(page_size=paginator.page_size, page_number=paginator.page_number)
 
     if not data:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=MESSEGE_NON_FOUND)

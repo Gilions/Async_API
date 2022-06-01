@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from core.config import MESSEGE_NON_FOUND
+from services.base import Paginator, get_paginator_params
 from services.films import (FilmService, FilmsService, get_film_service,
                             get_films_service)
 
@@ -32,10 +33,9 @@ class Films(BaseModel):
 @router.get('/', response_model=List[Films])
 async def films_index(
         sort: Union[str, None] = None,
-        page_size: int = Query(50, alias="page[size]"),
-        page_number: int = Query(1, alias="page[number]"),
+        paginator: Paginator = Depends(get_paginator_params),
         service: FilmsService = Depends(get_films_service)) -> List[Films]:
-    data = await service.get_data(sorting=sort, page_size=page_size, page_number=page_number)
+    data = await service.get_data(sorting=sort, page_size=paginator.page_size, page_number=paginator.page_number)
 
     if not data:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=MESSEGE_NON_FOUND)
@@ -47,10 +47,9 @@ async def films_index(
 @router.get('/search', response_model=List[Films])
 async def films_search(
         query: Union[str, None] = None,
-        page_size: int = Query(50, alias="page[size]"),
-        page_number: int = Query(1, alias="page[number]"),
+        paginator: Paginator = Depends(get_paginator_params),
         service: FilmsService = Depends(get_films_service)) -> List[Films]:
-    data = await service.get_data(search=query, page_size=page_size, page_number=page_number)
+    data = await service.get_data(search=query, page_size=paginator.page_size, page_number=paginator.page_number)
 
     if not data:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=MESSEGE_NON_FOUND)

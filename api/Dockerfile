@@ -12,3 +12,5 @@ RUN apt-get update \
 COPY ./requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 COPY ./src .
+
+ENTRYPOINT ["/app/entrypoint.sh"]
