@@ -10,8 +10,14 @@ from orjson import loads
 from core.config import CACHE_EXPIRE_IN_SECONDS
 from models.movies import Film, Genre, Person
 from services.utility import orjson_dumps
-
+from fastapi import Query
+from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
+
+
+class Paginator(BaseModel):
+    page_size: int = Field(default=50)
+    page_number: int = Field(default=1)
 
 
 class BaseDitailService:
@@ -119,3 +125,10 @@ class BaseListService:
             orjson_dumps(data, default=Film.json),
             expire=CACHE_EXPIRE_IN_SECONDS
         )
+
+
+def get_paginator_params(
+        page_size: int = Query(50, alias='page[size]'),
+        page_number: int = Query(1, alias='page[number]')
+):
+    return Paginator(page_size=page_size, page_number=page_number)

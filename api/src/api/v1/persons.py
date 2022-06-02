@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic.main import BaseModel
 
 from core.config import MESSEGE_NON_FOUND
+from services.base import Paginator, get_paginator_params
 from services.persons import (PersonService, PersonsService,
                               get_person_service, get_persons_service)
 
@@ -21,10 +22,9 @@ class Persons(BaseModel):
 
 @router.get('/', response_model=List[Persons])
 async def persons_index(
-        page_size: int = Query(50, alias="page[size]"),
-        page_number: int = Query(1, alias="page[number]"),
+        paginator: Paginator = Depends(get_paginator_params),
         service: PersonsService = Depends(get_persons_service)) -> List[Persons]:
-    data = await service.get_data(page_size=page_size, page_number=page_number)
+    data = await service.get_data(page_size=paginator.page_size, page_number=paginator.page_number)
     if not data:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=MESSEGE_NON_FOUND)
     response = [Persons(**dict(row)) for row in data]
@@ -34,10 +34,9 @@ async def persons_index(
 @router.get('/search', response_model=List[Persons])
 async def person_search(
         query: Union[str, None] = None,
-        page_size: int = Query(50, alias="page[size]"),
-        page_number: int = Query(1, alias="page[number]"),
+        paginator: Paginator = Depends(get_paginator_params),
         service: PersonsService = Depends(get_persons_service)) -> List[Persons]:
-    data = await service.get_data(search=query, page_size=page_size, page_number=page_number)
+    data = await service.get_data(search=query, page_size=paginator.page_size, page_number=paginator.page_number)
     if not data:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=MESSEGE_NON_FOUND)
     response = [Persons(**dict(row)) for row in data]

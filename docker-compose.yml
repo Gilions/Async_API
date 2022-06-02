@@ -10,10 +10,8 @@ services:
     restart: always
     volumes:
       - movies_db:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=app
-      - POSTGRES_PASSWORD=123qwe
-      - POSTGRES_DB=movies_database
+    env_file:
+      - .env
 
 #================================
 #       ELK
@@ -57,7 +55,6 @@ services:
     image: movies_api
     container_name: movies_api
     restart: on-failure
-    command: gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:7000
     env_file:
       - .env
     depends_on:
